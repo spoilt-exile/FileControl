@@ -1,0 +1,51 @@
+FileControl README
+
+Current version: v0.1 (Jan 2nd 2013)
+
+DESCRIPTION
+
+FileControl is a file monitoring application. It can monitor
+file presense or ebsence, ignore or include folders in scaning,
+search with file mask syntax and handle search errors.
+
+Application operate with entries. Each entry include name of
+entry, path to search, mask to search (for example: *.txt or 
+???file.ext), ignore mask (if search mask = *.txt and ignore
+mask = foo.txt then foo.txt will be ignored during scaning),
+error condition switch (enabled = treat searching success as
+error (files present), disabled = treat searching failure as
+error (files ebsent)), case sensetive switch (search with mask
+TeSt* will ignore such files as test.file, not work under 
+Windows) and folder ignore switch (folders will be ignored).
+
+Application supports several ways to notify user: icon changing
+(application icon turn to red even if one of entries return
+error) and sound notification. Also FileControl may execute any
+command to system shell. Basicly it will launch filemanager to
+entry's path with command 'filemanager $PATH'. Command for 
+Windows: 'explorer $PATH' or for Linux: 'xdg-open $PATH' or 
+even 'mc $PATH'.
+
+CHANGELOG
+
+*See changelog at CHANGELOG file.
+
+DEPENDECIES
+
+libRibbonData - <https://github.com/spoilt-exile/libRibbonData>
+
+LICENSE AND COPYRIGHT
+
+Application licensed under GNU GPLv2+. All source code 
+available at <https://github.com/spoilt-exile/FileControl>.
+
+© Stanislav Nepochatov 2013.
+
+THIRD-PARTY COMPONENTS
+
+Copyright for oxygen icons belong to KDE team, original 
+copyright file from icons Debian distribution included with
+licence file.
+
+Copyright for sound alarm file belong to KDE team, licensed
+under GNU GPLv2.
