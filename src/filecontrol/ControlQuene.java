@@ -292,6 +292,7 @@ public final class ControlQuene {
         for (Integer cindex = 0; cindex < FileControl.MainWindow.controlTable.getRowCount(); cindex++) {
             ControlEntry curr_entry = ControlQuene.getEntry(cindex);
             FileControl.MainWindow.controlTable.setValueAt(curr_entry.StrStatus, cindex, 3);
+            FileControl.MainWindow.controlTable.repaint();
         }
     }
 }
