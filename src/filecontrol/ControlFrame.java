@@ -140,7 +140,7 @@ public class ControlFrame extends javax.swing.JFrame {
             if (FileControl.MainProperties.getProperty("err_play_sound").equals("1")) {
                 try {
                     javax.sound.sampled.Clip clip = javax.sound.sampled.AudioSystem.getClip();
-                    clip.open(javax.sound.sampled.AudioSystem.getAudioInputStream(getClass().getResourceAsStream("/sounds/Error.wav")));
+                    clip.open(javax.sound.sampled.AudioSystem.getAudioInputStream(new java.io.BufferedInputStream(getClass().getResourceAsStream("/sounds/Error.wav"))));
                     clip.start();
                 } catch (Exception ex) {
                     ex.printStackTrace(System.out);
