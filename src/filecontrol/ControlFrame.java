@@ -147,8 +147,10 @@ public class ControlFrame extends javax.swing.JFrame {
                 }
             }
             this.setIconImage(appIconError);
+            FileControl.controlIcon.setImage(appIconError);
         } else {
             this.setIconImage(appIconNormal);
+            FileControl.controlIcon.setImage(appIconNormal);
         }
     }
     
@@ -233,7 +235,6 @@ public class ControlFrame extends javax.swing.JFrame {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Контроль файлов");
         setIconImage(appIconNormal);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -395,11 +396,13 @@ public class ControlFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        /**
         FileControl.log(2, "Завершение работы программы.");
         FileControl.MainProperties.setProperty("window_pos_x", String.valueOf(this.getX()));
         FileControl.MainProperties.setProperty("window_pos_y", String.valueOf(this.getY()));
         FileControl.MainProperties.setProperty("scan_timer_index", String.valueOf(this.timerBox.getSelectedIndex()));
         FileControl.storeProperties();
+        **/
     }//GEN-LAST:event_formWindowClosing
 
     private void removeButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButActionPerformed
@@ -473,7 +476,7 @@ public class ControlFrame extends javax.swing.JFrame {
     private javax.swing.JButton refreshBut;
     public javax.swing.JButton removeBut;
     private javax.swing.JToggleButton scanState;
-    private javax.swing.JComboBox timerBox;
+    public javax.swing.JComboBox timerBox;
     private javax.swing.JLabel timerLabel;
     // End of variables declaration//GEN-END:variables
 }

@@ -54,6 +54,11 @@ public class FileControl {
      * User notify flag;
      */
     public static Boolean notifyFlag = false;
+    
+    /**
+     * System tray icon object
+     */
+    public static java.awt.TrayIcon controlIcon;
 
     /**
      * @param args the command line arguments
@@ -64,6 +69,7 @@ public class FileControl {
         initProperties();
         ControlQuene.init();
         MainWindow.postInit();
+        initSystemTray();
         MainWindow.setVisible(true);
     }
     
@@ -112,6 +118,56 @@ public class FileControl {
             MainProperties.load(new java.io.FileInputStream(mainProps));
         } catch (java.io.IOException ex) {
             log(0, "Невозможно прочитать файл конфигурации!");
+        }
+    }
+    
+    /**
+     * Init system tray object;
+     */
+    private static void initSystemTray() {
+        java.awt.PopupMenu controlMenu = new java.awt.PopupMenu();
+        java.awt.MenuItem showItem = new java.awt.MenuItem("Показать");
+        java.awt.MenuItem exitItem = new java.awt.MenuItem("Выход");
+        controlMenu.add(showItem);
+        controlMenu.addSeparator();
+        controlMenu.add(exitItem);
+        controlIcon = new java.awt.TrayIcon(MainWindow.appIconNormal);
+        controlIcon.setPopupMenu(controlMenu);
+        showItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                FileControl.MainWindow.setVisible(true);
+            }
+        });
+        exitItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                Object[] options = {"Да", "Нет"};
+                Integer result = javax.swing.JOptionPane.showOptionDialog(new javax.swing.JPanel(),
+                    "Закрыть программу?",
+                    "Контроль файлов",
+                    javax.swing.JOptionPane.YES_NO_CANCEL_OPTION,
+                    javax.swing.JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[1]
+                );
+                if (result == 0) {
+                    FileControl.controlExit();
+                }
+            }
+        });
+        controlIcon.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                FileControl.MainWindow.setVisible(true);
+            }
+        });
+        try {
+            java.awt.SystemTray.getSystemTray().add(controlIcon);
+        } catch (java.awt.AWTException ex) {
+            log(1, "Невозможно инициализировать поддержку системного лотка!");
+            ex.printStackTrace();
         }
     }
     
@@ -191,5 +247,17 @@ public class FileControl {
             }
         }
         notifyFlag = true;
+    }
+    
+    /**
+     * Exit FileControl application;
+     */
+    private static void controlExit() {
+        log(2, "Завершение работы программы.");
+        MainProperties.setProperty("window_pos_x", String.valueOf(MainWindow.getX()));
+        MainProperties.setProperty("window_pos_y", String.valueOf(MainWindow.getY()));
+        MainProperties.setProperty("scan_timer_index", String.valueOf(MainWindow.timerBox.getSelectedIndex()));
+        storeProperties();
+        System.exit(0);
     }
 }
