@@ -68,8 +68,8 @@ public class FileControl {
         initLogFile();
         initProperties();
         ControlQuene.init();
-        MainWindow.postInit();
         initSystemTray();
+        MainWindow.postInit();
         MainWindow.setVisible(true);
     }
     

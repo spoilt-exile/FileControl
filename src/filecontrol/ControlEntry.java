@@ -145,14 +145,14 @@ public class ControlEntry extends Generic.CsvElder {
                     this.StrStatus = "OK";
                     this.EntryColor = new java.awt.Color(165, 255, 145);
                 } else {
-                    this.StrStatus = "Файли не знайдено!";
+                    this.StrStatus = "Файлы не найдены!";
                     this.EntryColor = new java.awt.Color(255, 69, 69);
                     FileControl.log(2, "[" + this.EntryName + "] >> " + this.StrStatus);
                     FileControl.conditionHandle(false, this);
                 }
                 break;
             case IOEXCEPTION_OCURRED:
-                this.StrStatus = "Помилка читання!";
+                this.StrStatus = "Ошибка чтения!";
                 this.EntryColor = new java.awt.Color(255, 147, 69);
                 FileControl.log(1, "Ошибка чтения (" + Path + ")!");
                 break;
@@ -161,7 +161,7 @@ public class ControlEntry extends Generic.CsvElder {
                     this.StrStatus = "OK(" + CurrHits + ")";
                     this.EntryColor = new java.awt.Color(165, 255, 145);
                 } else {
-                    this.StrStatus = "ЗНАЙДЕНО(" + CurrHits + ")";
+                    this.StrStatus = "НАЙДЕНО(" + CurrHits + ")";
                     this.EntryColor = new java.awt.Color(255, 69, 69);
                     FileControl.log(2, "[" + this.EntryName + "] >> " + this.StrStatus);
                     FileControl.conditionHandle(true, this);
