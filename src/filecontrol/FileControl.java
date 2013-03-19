@@ -41,6 +41,11 @@ public class FileControl {
     private static java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
     
     /**
+     * Date format
+     */
+    private static java.text.DateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm:ss");
+    
+    /**
      * Config path to files
      */
     public static String configPath = System.getProperty("user.home") + "/.FileControl";
@@ -189,6 +194,16 @@ public class FileControl {
     private static String getCurrentDate() {
         java.util.Date now = new java.util.Date();
         String strDate = dateFormat.format(now);
+        return strDate;
+    }
+    
+    /**
+     * Get current time with default time format
+     * @return current time in string;
+     */
+    public static String getCurrentTime() {
+        java.util.Date now = new java.util.Date();
+        String strDate = timeFormat.format(now);
         return strDate;
     }
     

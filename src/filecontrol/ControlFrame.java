@@ -51,6 +51,11 @@ public class ControlFrame extends javax.swing.JFrame {
     private javax.swing.ImageIcon scanStateDisabled = new javax.swing.ImageIcon(getClass().getResource("/icons/scan_pause.png"));
     
     /**
+     * Current render class;
+     */
+    private ProgressRender currentProgress;
+    
+    /**
      * Control cell render class
      */
     private class ControlCellRender extends javax.swing.JLabel implements javax.swing.table.TableCellRenderer {
@@ -79,6 +84,51 @@ public class ControlFrame extends javax.swing.JFrame {
     }
     
     /**
+     * Progress bar renderer thread;
+     */
+    private class ProgressRender extends Thread {
+        
+        private Integer TIMER_INT = getTimerValue();
+        
+        private Boolean IS_ACTIVE = true;
+        
+        @Override
+        public void run() {
+            while (scanState.isEnabled()) {
+                mainLoop();
+                try {
+                    Thread.sleep(TIMER_INT * 600);
+                } catch (InterruptedException ex) {
+                    switch (ControlQuene.CurrFlag) {
+                        case REFRESH:
+                            checkProgress.setValue(100);
+                            break;
+                        case STOP_CHECK:
+                            IS_ACTIVE = false;
+                            checkProgress.setValue(checkProgress.getValue() + 1);
+                            break;
+                        case RENEW_CHECK:
+                            IS_ACTIVE = true;
+                            mainLoop();
+                            checkProgress.setValue(100);
+                            break;
+                        case CHANGE_TIMER:
+                            checkProgress.setValue(100);
+                            TIMER_INT = getTimerValue();
+                            break;
+                    }
+                }
+            }
+        }
+        
+        private void mainLoop() {
+            if (IS_ACTIVE) {
+                checkProgress.setValue(checkProgress.getValue() - 1);
+            }
+        }
+    }
+    
+    /**
      * Creates new form ControlFrame
      */
     public ControlFrame() {
@@ -103,7 +153,9 @@ public class ControlFrame extends javax.swing.JFrame {
     public void postInit() {
         setTimerIndex(Integer.parseInt(FileControl.MainProperties.getProperty("scan_timer_index")));
         setLocation(Integer.parseInt(FileControl.MainProperties.getProperty("window_pos_x")), Integer.parseInt(FileControl.MainProperties.getProperty("window_pos_y")));
-        FileControl.MainWindow.buildControlTable();
+        buildControlTable();
+        currentProgress = new ProgressRender();
+        currentProgress.start();
     }
     
     /**
@@ -136,6 +188,10 @@ public class ControlFrame extends javax.swing.JFrame {
      * Notify user with sound alarm and icon changing;
      */
     public void userNotify() {
+        this.checkStamp.setText(FileControl.getCurrentTime());
+        if (this.currentProgress != null) {
+            this.currentProgress.interrupt();
+        }
         if (FileControl.notifyFlag) {
             if (FileControl.MainProperties.getProperty("err_play_sound").equals("1")) {
                 try {
@@ -208,6 +264,8 @@ public class ControlFrame extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         logViewPane = new javax.swing.JTextPane();
         jButton1 = new javax.swing.JButton();
+        checkStamp = new javax.swing.JLabel();
+        checkProgress = new javax.swing.JProgressBar();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -237,11 +295,6 @@ public class ControlFrame extends javax.swing.JFrame {
 
         setTitle("Контроль файлов");
         setIconImage(appIconNormal);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                formWindowClosing(evt);
-            }
-        });
 
         addBut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/entry_add.png"))); // NOI18N
         addBut.setText("Добавить");
@@ -308,6 +361,11 @@ public class ControlFrame extends javax.swing.JFrame {
             }
         });
 
+        checkStamp.setBackground(new java.awt.Color(0, 0, 0));
+        checkStamp.setText("--:--:--");
+
+        checkProgress.setValue(100);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -327,7 +385,11 @@ public class ControlFrame extends javax.swing.JFrame {
                             .addComponent(timerBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(refreshBut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(scanState, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(checkProgress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(checkStamp)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -353,7 +415,11 @@ public class ControlFrame extends javax.swing.JFrame {
                         .addComponent(jButton1))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(checkStamp)
+                    .addComponent(checkProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -383,10 +449,12 @@ public class ControlFrame extends javax.swing.JFrame {
             this.scanState.setText("Остановить");
             this.scanState.setIcon(scanStateDisabled);
             ControlQuene.renewScan();
+            this.currentProgress.interrupt();
         } else {
             this.scanState.setText("Запустить");
             this.scanState.setIcon(scanStateEnabled);
             ControlQuene.stopScan();
+            this.currentProgress.interrupt();
         }
     }//GEN-LAST:event_scanStateActionPerformed
 
@@ -394,16 +462,6 @@ public class ControlFrame extends javax.swing.JFrame {
         SettingsDialog scanDialog = new SettingsDialog(this, true);
         scanDialog.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        /**
-        FileControl.log(2, "Завершение работы программы.");
-        FileControl.MainProperties.setProperty("window_pos_x", String.valueOf(this.getX()));
-        FileControl.MainProperties.setProperty("window_pos_y", String.valueOf(this.getY()));
-        FileControl.MainProperties.setProperty("scan_timer_index", String.valueOf(this.timerBox.getSelectedIndex()));
-        FileControl.storeProperties();
-        **/
-    }//GEN-LAST:event_formWindowClosing
 
     private void removeButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButActionPerformed
         Object[] options = {"Да", "Нет"};
@@ -464,6 +522,8 @@ public class ControlFrame extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addBut;
+    private javax.swing.JProgressBar checkProgress;
+    private javax.swing.JLabel checkStamp;
     public javax.swing.JTable controlTable;
     public javax.swing.JButton editBut;
     private javax.swing.JButton jButton1;

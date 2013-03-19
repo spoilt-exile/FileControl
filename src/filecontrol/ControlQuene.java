@@ -38,7 +38,7 @@ public final class ControlQuene {
     /**
      * Interruption flag enumeration
      */
-    private static enum InterruptedFlag {
+    public static enum InterruptedFlag {
         /**
          * Refresh state of all entries
          */
@@ -63,7 +63,7 @@ public final class ControlQuene {
     /**
      * Current interruption flag;
      */
-    private static InterruptedFlag CurrFlag;
+    public static InterruptedFlag CurrFlag;
     
     /**
      * Current scan thread;
