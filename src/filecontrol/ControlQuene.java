@@ -99,6 +99,15 @@ public final class ControlQuene {
     }
     
     /**
+     * Reinitialization of the control task;
+     */
+    private static void reinit() {
+        FileControl.log(2, "процес перевірки аварійно перезавантажено!");
+        CurrTask = new ControlTask(FileControl.MainWindow.getTimerValue());
+        CurrTask.start();
+    }
+    
+    /**
      * Update quene index file;
      */
     public static void updateQueneIndex() {
@@ -156,23 +165,29 @@ public final class ControlQuene {
         @Override
         public void run() {
             while (RUN) {
-                mainLoop();
                 try {
-                    Thread.sleep(TIMER_INT * 60 * 1000);
-                } catch (InterruptedException ex) {
-                    switch (CurrFlag) {
-                        case REFRESH:
-                            break;
-                        case STOP_CHECK:
-                            this.CHECK = false;
-                            break;
-                        case RENEW_CHECK:
-                            this.CHECK = true;
-                            break;
-                        case CHANGE_TIMER:
-                            this.TIMER_INT = FileControl.MainWindow.getTimerValue();
-                            break;
+                    mainLoop();
+                    try {
+                        Thread.sleep(TIMER_INT * 60 * 1000);
+                    } catch (InterruptedException ex) {
+                        switch (CurrFlag) {
+                            case REFRESH:
+                                break;
+                            case STOP_CHECK:
+                                this.CHECK = false;
+                                break;
+                            case RENEW_CHECK:
+                                this.CHECK = true;
+                                break;
+                            case CHANGE_TIMER:
+                                this.TIMER_INT = FileControl.MainWindow.getTimerValue();
+                                break;
+                        }
                     }
+                } catch (Exception ex) {
+                    FileControl.log(1, "процес перевірки отримав помилку " + ex.getClass().getName());
+                    FileControl.log(2, "Зміст помилки:\n" + ex.toString());
+                    //reinit();
                 }
             }
         }
