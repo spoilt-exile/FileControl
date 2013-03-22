@@ -3,4 +3,16 @@ FileControl v0.1 (Jan 2nd 2013)
 
 Changes:
  ! first release of application;
+==========================================================================================
+FileControl v0.2 (Mar 22th 2013)
+
+Changes:
+ + Add system tray support;
+ + Check progress and timestamp display added;
+ * Improoved exception handling in ControlTask;
+
+Fixes:
+ X Sound alarm fixed (just by using BufferedInputStream);
+ X Force control table to repaint after update;
+ X Localization fixes;
 ========================================================================================== 
